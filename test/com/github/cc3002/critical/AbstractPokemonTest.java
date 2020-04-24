@@ -1,7 +1,6 @@
 package com.github.cc3002.critical;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -10,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author <a href="mailto:ignacio.slater@ug.uchile.cl">Ignacio Slater Muñoz</a>
- * @version 1.0-b.2
+ * @version 1.0-b.3
  * @since 1.0
  */
 public abstract class AbstractPokemonTest {
@@ -40,13 +39,6 @@ public abstract class AbstractPokemonTest {
   @Test
   public abstract void testHP();
 
-  @RepeatedTest(10)
-  public void testSeed() {
-    long expectedSeed = new Random(testSeed).nextLong();
-    testPokemon.setSeed(expectedSeed);
-    assertEquals(expectedSeed, testPokemon.getSeed());
-  }
-
   public void checkHP(IPokemon expectedResult, IPokemon expectedInit) {
     assertEquals(expectedInit, testPokemon);
     int expectedHP = 5;
@@ -56,6 +48,20 @@ public abstract class AbstractPokemonTest {
 
   @Test
   public abstract void testSpeed();
+
+  @Test
+  public void testSeed() {
+    long expectedSeed = 11;
+    testPokemon.setSeed(expectedSeed);
+    assertEquals(expectedSeed, testPokemon.getSeed());
+  }
+
+  @Test
+  public void outOfCombatTest() {
+    assertFalse(testPokemon.isOutOfCombat());
+    testPokemon.setHP(0);
+    assertTrue(testPokemon.isOutOfCombat());
+  }
 
   protected IPokemon getMudkip() {
     return getMudkipWithHP(10);
@@ -73,13 +79,6 @@ public abstract class AbstractPokemonTest {
     return new FirePokemon("Charmander", 8, 7, 4);
   }
 
-//
-//  @Test
-//  public void outOfCombatTest() {
-//    assertFalse(mudkip.isOutOfCombat());
-//    mudkip.setHP(0);
-//    assertTrue(mudkip.isOutOfCombat());
-//  }
 //
 //  @RepeatedTest(2 * 512 / MUDKIP_SPEED)
 //  public void resistantAttackTest() {

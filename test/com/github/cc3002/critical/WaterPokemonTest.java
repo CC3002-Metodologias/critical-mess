@@ -1,16 +1,13 @@
 package com.github.cc3002.critical;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author <a href="mailto:ignacio.slater@ug.uchile.cl">Ignacio Slater M.</a>.
- * @version 1.0-b.2
+ * @version 1.0-b.3
  * @since 1.0
  */
 public class WaterPokemonTest extends AbstractPokemonTest {
@@ -38,10 +35,10 @@ protected IPokemon getCharmander() {
   }
 
   @Override
-  @RepeatedTest(10)
+  @Test
   public void testSpeed() {
-    int expectedSpeed = new Random(testSeed).nextInt(100);
-    IPokemon actualMudkip = getMudkipWithSpeed(expectedSpeed);
+    int expectedSpeed = 11;
+    IPokemon actualMudkip = getMudkipWithSpeed(11);
     assertEquals(expectedSpeed, actualMudkip.getSpeed(), "Test failed with seed: " + testSeed);
   }
 }
