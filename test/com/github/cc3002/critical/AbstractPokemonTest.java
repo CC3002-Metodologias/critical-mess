@@ -1,5 +1,6 @@
 package com.github.cc3002.critical;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author <a href="mailto:ignacio.slater@ug.uchile.cl">Ignacio Slater Muñoz</a>
- * @version 1.0-b.3
+ * @version 1.0-rc.1
  * @since 1.0
  */
 public abstract class AbstractPokemonTest {
@@ -24,13 +25,13 @@ public abstract class AbstractPokemonTest {
   @Test
   public abstract void equalsTest();
 
-  protected void checkEquals(final IPokemon expectedPokemon) {
+  protected void checkEquals(IPokemon expectedPokemon) {
     assertEquals(testPokemon, testPokemon);
     assertNotSame(expectedPokemon, testPokemon);
     assertEquals(expectedPokemon, testPokemon);
   }
 
-  protected void checkNotEquals(final IPokemon actualPokemon) {
+  protected void checkNotEquals(IPokemon actualPokemon) {
     assertNotEquals(testPokemon, null);
     assertNotEquals(testPokemon, new Object());
     assertNotEquals(testPokemon, actualPokemon);
@@ -63,31 +64,59 @@ public abstract class AbstractPokemonTest {
     assertTrue(testPokemon.isOutOfCombat());
   }
 
-  protected IPokemon getMudkip() {
-    return getMudkipWithHP(10);
+  @Test
+  public abstract void damageTest();
+
+  @Test
+  public abstract void attackTest();
+
+  public void checkNormalAttack(IPokemon opponent) {
+    checkAttack(opponent, 1);
   }
 
-  protected IPokemon getMudkipWithHP(int hp) {
-    return new WaterPokemon("Mudkip", hp, 5, 3);
+  protected void checkWeaknessAttack(final IPokemon opponent) {
+    checkAttack(opponent, 2);
   }
 
-  protected IPokemon getMudkipWithSpeed(int speed) {
-    return new WaterPokemon("Mudkip", 10, 5, speed);
+  protected void checkResistantAttack(final IPokemon opponent) {
+    checkAttack(opponent, 0.5);
   }
 
-  protected IPokemon getCharmander() {
-    return new FirePokemon("Charmander", 8, 7, 4);
+  private void checkAttack(final @NotNull IPokemon opponent, final double dmgModifier) {
+    opponent.setSeed(6550495996727646960L);
+    int r = new Random(6550495996727646960L).nextInt(256);
+    int threshold = testPokemon.getSpeed() / 2;
+    int expectedHP = opponent.getHP() - (int) (testPokemon.getDamage() * (r < threshold ? 2 : 1)
+                                               * dmgModifier);
+    testPokemon.attack(opponent);
+    assertEquals(expectedHP, opponent.getHP(), "Test failed with seed: " + 6550495996727646960L);
   }
 
-//
-//  @RepeatedTest(2 * 512 / MUDKIP_SPEED)
-//  public void resistantAttackTest() {
-//    long seed = new Random().nextLong();
-//    mudkip.setSeed(seed);
-//    int r = new Random(seed).nextInt(256);
-//    int threshold = MUDKIP_SPEED / 2;
-//    int expectedHP = MUDKIP_HP - (MUDKIP_DAMAGE * (r < threshold ? 2 : 1) / 2);
-//    mudkip.attack(otherMudkip);
-//    assertEquals(expectedHP, otherMudkip.getHP());
-//  }
+  private IPokemon getPokemonWith(PokemonBreed breed, int hp, int damage, int speed) {
+    return switch (breed) {
+      case MUDKIP -> new WaterPokemon("Mudkip", hp, damage, speed);
+      case MILTANK -> new NormalPokemon("Miltank", hp, damage, speed);
+      case CHARMANDER -> new FirePokemon("Charmander", hp, damage, speed);
+    };
+  }
+
+  protected IPokemon getPokemon(PokemonBreed breed) {
+    return getPokemonWith(breed, 10, 5, 3);
+  }
+
+  protected IPokemon getPokemonWithHP(PokemonBreed breed, int hp) {
+    return getPokemonWith(breed, hp, 5, 3);
+  }
+
+  protected IPokemon getPokemonWithSpeed(PokemonBreed breed, int speed) {
+    return getPokemonWith(breed, 10, 5, speed);
+  }
+
+  public IPokemon getPokemonWithDamage(PokemonBreed breed, int damage) {
+    return getPokemonWith(breed, 10, damage, 3);
+  }
+
+  protected enum PokemonBreed {
+    MUDKIP, CHARMANDER, MILTANK
+  }
 }

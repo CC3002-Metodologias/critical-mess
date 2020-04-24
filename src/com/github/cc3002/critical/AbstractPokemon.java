@@ -6,7 +6,7 @@ import java.util.Random;
 
 /**
  * @author <a href="mailto:ignacio.slater@ug.uchile.cl">Ignacio Slater Muñoz</a>
- * @version 1.0-b.2
+ * @version 1.0-rc.1
  * @since 1.0
  */
 public abstract class AbstractPokemon implements IPokemon {
@@ -25,6 +25,32 @@ public abstract class AbstractPokemon implements IPokemon {
     rng = new Random();
   }
 
+  @Override
+  public abstract void attack(final IPokemon opponent);
+
+  @Override
+  public void receiveWaterAttack(final WaterPokemon attacker) {
+    receiveDamage(attacker);
+  }
+
+  private void calculateReceivedDamage(double attackerDamage, int attackerSpeed) {
+    int threshold = attackerSpeed / 2;
+    int r = rng.nextInt(256);
+    setHP(hp - (int) (attackerDamage * (r < threshold ? 2 : 1)));
+  }
+
+  protected void receiveDamage(final @NotNull IPokemon attacker) {
+    calculateReceivedDamage(attacker.getDamage(), attacker.getSpeed());
+  }
+
+  protected void receiveResistantDamage(final @NotNull IPokemon attacker) {
+    calculateReceivedDamage(attacker.getDamage() * 0.5, attacker.getSpeed());
+  }
+
+  protected void receiveWeaknessDamage(final @NotNull IPokemon attacker) {
+    calculateReceivedDamage(attacker.getDamage() * 2, attacker.getSpeed());
+  }
+
   public boolean isOutOfCombat() {
     return hp == 0;
   }
@@ -41,9 +67,9 @@ public abstract class AbstractPokemon implements IPokemon {
     this.hp = hp;
   }
 
-  public void attack(final @NotNull AbstractPokemon opponent) {
-    int threshold = speed / 2;
-    opponent.hp -= damage * (rng.nextInt(256) < threshold ? 2 : 1);
+  @Override
+  public int getDamage() {
+    return damage;
   }
 
   @Override
@@ -54,7 +80,7 @@ public abstract class AbstractPokemon implements IPokemon {
   @Override
   public void setSeed(final long seed) {
     this.seed = seed;
-    this.rng.setSeed(seed);
+    this.rng = new Random(seed);
   }
 
   @Override
