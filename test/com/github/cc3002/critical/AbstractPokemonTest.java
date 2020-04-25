@@ -83,13 +83,13 @@ public abstract class AbstractPokemonTest {
   }
 
   private void checkAttack(final @NotNull IPokemon opponent, final double dmgModifier) {
-    opponent.setSeed(6550495996727646960L);
-    int r = new Random(6550495996727646960L).nextInt(256);
+    opponent.setSeed(testSeed);
+    int r = new Random(testSeed).nextInt(256);
     int threshold = testPokemon.getSpeed() / 2;
     int expectedHP = opponent.getHP() - (int) (testPokemon.getDamage() * (r < threshold ? 2 : 1)
                                                * dmgModifier);
     testPokemon.attack(opponent);
-    assertEquals(expectedHP, opponent.getHP(), "Test failed with seed: " + 6550495996727646960L);
+    assertEquals(expectedHP, opponent.getHP(), "Test failed with seed: " + testSeed);
   }
 
   private IPokemon getPokemonWith(PokemonBreed breed, int hp, int damage, int speed) {

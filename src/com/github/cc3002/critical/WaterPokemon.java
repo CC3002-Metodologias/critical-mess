@@ -21,4 +21,5 @@ public class WaterPokemon extends AbstractPokemon {
   public void receiveWaterAttack(final WaterPokemon attacker) {
     receiveResistantDamage(attacker);
   }
+
 }
